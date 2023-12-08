@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rifa de Navidad</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+      <style>
+    table {
+        width: 100%;
+    }
+    table, th, td {
+      border: 5px solid #db343b
+    }
+    th, td {
+      padding: 10px;
+      text-align: center;
+      background: #13c2c2;
+    }
+  </style>
+</head>
+<body class="container">
+    <img src="{{ url_for('static', filename='rifa5millones.jpeg') }}" alt="Rifa" class="img-fluid">
+    <p>¡Selecciona tu número de la suerte para ver disponibilidad!</p>
+
+      <div id="grid-container" class="mt-3"></div>
+
+        <!-- Modal para mostrar los datos -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="myModalLabel">Datos de la boleta</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="modal-body">
+                    <!-- Aquí se mostrarán los datos -->
+                        <form action="/vender_boleto" method="post">
+                            <label for="nombre">Nombre:</label>
+                            <input type="text" id="nombre" name="nombre" required><br><br>
+                            <label for="apellido">Apellido:</label>
+                            <input type="text" id="apellido" name="apellido" required><br><br>
+                            <label for="telefono">Teléfono:</label>
+                            <input type="tel" id="telefono" name="telefono" required><br><br>
+                            <label for="direccion">Dirección:</label>
+                            <input type="text" id="direccion" name="direccion" required><br><br>
+                            <label for="abono">Abono:</label>
+                            <input type="number" id="abono" name="abono" required><br><br>
+                            <button type="submit">Vender boleto</button>
+                        </form>
+                    <p>Precio del bono: ${{ precio_boleto }}</p>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!--    <form method="POST" enctype="multipart/form-data"  action="/">-->
+<!--        <input type="file" name="file" accept=".csv">-->
+<!--        <input type="submit" value="Subir">-->
+<!--    </form>-->
+<!--    <p style="color:blue;">Escoje el archivo CSV para cargar los datos</p>-->
+<!--    <form action="/show_data" target="_blank" >-->
+<!--        <input type="submit" value=" Mostrar datos">-->
+<!--    </form>-->
+            <!-- Rellenar celdas de la rifa aquí dinámicamente -->
+<!--            {% for i in range(10) %}-->
+<!--                <tr>-->
+<!--                    {% for j in range(10) %}-->
+<!--                        <td{% if numero_seleccionado == (i*10 + j) %} style="background-color: #FFD700;"{% endif %}>{{ i }}{{ j }}</td>-->
+<!--                    {% endfor %}-->
+<!--                </tr>-->
+            {% endfor %}
+
+  <script>
+      // Genera la matriz de 10x10
+     document.addEventListener("DOMContentLoaded", function () {
+    // Crear la tabla
+    var table = document.createElement("table");
+
+    // Bucle para las filas
+    for (var i = 0; i < 10; i++) {
+      var row = document.createElement("tr");
+      // Bucle para las columnas
+      for (var j = 0; j < 10; j++) {
+        var cell = document.createElement("td");
+        cell.textContent = " " + (i ) +  (j );
+º
+
+
+
+        cell.addEventListener("mouseover", function () {
+            this.style.backgroundColor = "#FFD700" ;
+        });
+        cell.addEventListener("mouseout", function () {
+            this.style.backgroundColor = "";
+        });
+        cell.addEventListener("click", function () {
+            console.log("Esta es la boleta "+ this.textContent);
+            comprarNumero(this.textContent);
+            //alert("La boleta esta disponible animate a escogerla");
+        })
+        row.appendChild(cell);
+      }
+
+      // Agregar la fila a la tabla
+      table.appendChild(row);
+    }
+
+    // Agregar la tabla al cuerpo del documento
+    document.getElementById("grid-container").appendChild(table);
+  });
+      // Configura la función para comprar un número
+      const comprarNumero = (numero) => {
+        fetch('/search_avalaible', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ numero: parseInt(numero) }),
+        })
+          .then(response => response.json())
+          .then(data =>
+              //alert(data['mensaje'])
+              {
+                // Mostrar los datos en el modal
+                //document.getElementById('modal-body').innerHTML = data.mensaje;
+                $('#myModal').modal('show');
+            }
+
+          )
+          .catch(error => console.error('Error:', error));
+      };
+      // Configura el botón de compra
+      // const buyButton = document.getElementById("buyButton");
+      // buyButton.addEventListener("click", function () {
+      //   alert("¡Botón de compra presionado!");
+      //   // Aquí puedes agregar la lógica adicional si es necesario.
+      // });
+  </script>
+    <!-- Agregar enlace a los scripts de Bootstrap (jQuery y Popper.js) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <!-- Agregar enlace al script de Bootstrap -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
